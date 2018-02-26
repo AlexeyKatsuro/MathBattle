@@ -38,4 +38,14 @@ public class Question {
         result.append("\n");
         return result.toString();
     }
+
+    public Answer getTrueAnswer(){
+        for (Answer answer : mAnswerList){
+            if(answer.isTrue()){
+                return answer;
+            }
+        }
+        return null;
+    }
+
 }

@@ -5,6 +5,7 @@
     <color name="colorAccent">#fff370</color>
     <color name="colorCardBackgound">@color/cardview_light_background</color>
     <color name="soothing_blue">#0083BF</color>
+
     <color name="colorTrue">@android:color/holo_green_light</color>
     <color name="colorFale">@android:color/holo_red_light</color>
 </resources>

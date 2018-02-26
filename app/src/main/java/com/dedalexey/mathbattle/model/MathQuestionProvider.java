@@ -49,7 +49,7 @@ public class MathQuestionProvider implements QuestionListProvider{
             }
         }
         answerList.get(sum-1).setTrue(true);
-        stringBuilder.append(" = ?");
+
 
         return new Question(stringBuilder.toString(), answerList);
     }

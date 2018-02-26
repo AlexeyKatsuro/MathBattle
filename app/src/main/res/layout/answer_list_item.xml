@@ -18,7 +18,7 @@
         android:id="@+id/answer_button"
         android:layout_width="45dp"
         android:layout_height="45dp"
-
+        android:background="@drawable/button_shape"
         android:textAppearance="?android:textAppearanceListItem"
         />
 </LinearLayout>

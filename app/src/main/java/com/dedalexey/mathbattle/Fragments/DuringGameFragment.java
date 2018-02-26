@@ -2,6 +2,7 @@ package com.dedalexey.mathbattle.Fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Vibrator;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -48,6 +49,7 @@ public class DuringGameFragment extends Fragment {
 
     private MyCountDownTimer mTimer;
     private long mInitialTime = 15000;
+    private Question mQuestion;
 
     public interface CallBacks {
         void onEndGame();
@@ -145,24 +147,26 @@ public class DuringGameFragment extends Fragment {
     private void updateUI() {
 
 
-        Question question = mProvider.provideQuestionNumber(mIndexQuestion);
+        if(isAdded()) {
+            mQuestion = mProvider.provideQuestionNumber(mIndexQuestion);
 
-        mQuestionTextView.setText(question.getQuestionText());
-        mMistakesTextView.setText(getString(R.string.mistake_format,mMistakesValue,mMaxMistakesValue));
+            mQuestionTextView.setText(mQuestion.getQuestionText() + " = ?");
+            mMistakesTextView.setText(getString(R.string.mistake_format, mMistakesValue, mMaxMistakesValue));
 
-        if(mQuestionList!=null) {
-            mIndexTextView.setText(getString(R.string.round_format_list, mIndexQuestion + 1, mQuestionList.size()));
-        } else {
-            mIndexTextView.setText(getString(R.string.round_format_single, mIndexQuestion + 1));
-        }
+            if (mQuestionList != null) {
+                mIndexTextView.setText(getString(R.string.round_format_list, mIndexQuestion + 1, mQuestionList.size()));
+            } else {
+                mIndexTextView.setText(getString(R.string.round_format_single, mIndexQuestion + 1));
+            }
 
-        if(mAdapter == null) {
-            mAdapter = new AnswerAdapter(question.getAnswerList());
-            mAnswersRecyclerView.setAdapter(mAdapter);
+            if (mAdapter == null) {
+                mAdapter = new AnswerAdapter(mQuestion.getAnswerList());
+                mAnswersRecyclerView.setAdapter(mAdapter);
 
-        } else {
-            mAdapter.setAnswerList(question.getAnswerList());
-            mAdapter.notifyDataSetChanged();
+            } else {
+                mAdapter.setAnswerList(mQuestion.getAnswerList());
+                mAdapter.notifyDataSetChanged();
+            }
         }
 
     }
@@ -182,39 +186,35 @@ public class DuringGameFragment extends Fragment {
         public void bindAnswer(Answer answer){
             mAnswer = answer;
             mAnswerTextView.setText(mAnswer.toString());
-            if(answer.isTrue()) {
-                mAnswerButton.setBackgroundResource(R.drawable.button_true);
-            } else {
-                mAnswerButton.setBackgroundResource(R.drawable.button_false);
-            }
+            mAnswerButton.setBackground(getResources().getDrawable(R.drawable.button_shape));
         }
 
         @Override
         public void onClick(View view) {
-//            if(mTimer!=null) {
-//                mTimer.cancel();
-//            }
-
 
             if(mAnswer.isTrue()) {
                 mTimer.addTime(3000);
                 mProgressBar.setMax((int) mTimer.getTotalTime());
+                mIndexQuestion++;
+                mAnswerButton.setBackground(getResources().getDrawable(R.drawable.true_shape));
             } else {
-                mTimer.addTime(-2000);
-                mMistakesValue++;
+                mAnswerButton.setBackground(getResources().getDrawable(R.drawable.false_shape));
+                mTimer.addTime(-3000);
                 ((Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE)).vibrate(250);
             }
-
+            //mQuestionTextView.setText(mQuestion.getQuestionText() + " = " + mQuestion.getTrueAnswer().toString());
             if(mMistakesValue>mMaxMistakesValue){
                 onFinishGame();
                 return;
-            } else {
-                mIndexQuestion++;
             }
 
-            updateUI();
-
-            //mTimer.start();
+            Handler handler = new Handler();
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    updateUI();
+                }
+            });
         }
     }
 
