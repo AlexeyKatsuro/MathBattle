@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="16dp"
+    android:layout_gravity="center"
+    android:visibility="visible"
+    app:cardCornerRadius="@dimen/cardRadius"
+    app:cardElevation="@dimen/cardElevation">
+    <RelativeLayout
+        android:id="@+id/content_frame"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="visible">
+
+
+
+        <TextView
+            android:id="@+id/rounds_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp"
+            tools:text="rounds:"/>
+        <TextView
+            android:id="@+id/time_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp"
+            tools:text="rounds:"/>
+        <TextView
+            android:id="@+id/mistakes_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
+            tools:text="rounds:"/>
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/mistakes_text_view"
+            android:indeterminate="false"
+            android:rotation="180"/>
+        <TextView
+            android:id="@+id/question_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/progressBar"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="12dp"
+            android:textAlignment="center"
+            android:textAppearance="?android:textAppearanceLarge"
+            tools:text="Question"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/answers_recycler_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/question_text_view"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="12dp"/>
+
+
+    </RelativeLayout>
+</android.support.v7.widget.CardView>

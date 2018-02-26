@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Math Battle</string>
+    <string name="play">Play</string>
+    <string name="settings">Settings</string>
+    <string name="exit">Exit</string>
+    <string name="ready">Ready?</string>
+    <string name="home">Home</string>
+    <string name="statistics">Statistics</string>
+    <string name="repeat">Repeat</string>
+
+    <string name="round_format_list">round:\n%1$d/%2$d</string>
+    <string name="round_format_single">round:\n%1$d</string>
+    <string name="mistake_format">mistake:\n%1$d/%2$d</string>
+    <string name="time_format">Time:\n%1$d.%2$d</string>
+</resources>
