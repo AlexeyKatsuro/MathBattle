@@ -18,10 +18,12 @@ import android.widget.TextView;
 
 import com.dedalexey.mathbattle.MyCountDownTimer;
 import com.dedalexey.mathbattle.R;
+import com.dedalexey.mathbattle.model.Statistics;
 import com.dedalexey.mathbattle.model.Answer;
 import com.dedalexey.mathbattle.model.MathQuestionProvider;
 import com.dedalexey.mathbattle.model.Question;
 import com.dedalexey.mathbattle.model.QuestionListProvider;
+import com.dedalexey.mathbattle.model.SessionInfo;
 
 import java.util.List;
 
@@ -47,6 +49,7 @@ public class DuringGameFragment extends Fragment {
     private AnswerAdapter mAdapter;
     private CallBacks mCallBacks;
 
+    private SessionInfo mSessionInfo;
     private MyCountDownTimer mTimer;
     private long mInitialTime = 15000;
     private Question mQuestion;
@@ -71,6 +74,7 @@ public class DuringGameFragment extends Fragment {
 
 
         initCallBacksListener();
+        mSessionInfo = new SessionInfo();
         mTimer = new MyCountDownTimer(mInitialTime,50);
         mTimer.setOnTickListener(new MyCountDownTimer.onTickListener() {
             @Override
@@ -90,6 +94,14 @@ public class DuringGameFragment extends Fragment {
     public void onFinishGame() {
         mTimer.cancel();
         mCallBacks.onEndGame();
+        mSessionInfo.setTotalTime(mTimer.getTotalTime());
+        Statistics.get(getActivity()).addSessionInfo(mSessionInfo);
+
+        List<SessionInfo> sessionInfoList = Statistics.get(getActivity()).getSessionInfoList();
+        for(SessionInfo sessionInfo : sessionInfoList ){
+            Log.d(TAG, sessionInfo.toString());
+        }
+
     }
 
     private void initCallBacksListener() {
@@ -193,14 +205,9 @@ public class DuringGameFragment extends Fragment {
         public void onClick(View view) {
 
             if(mAnswer.isTrue()) {
-                mTimer.addTime(3000);
-                mProgressBar.setMax((int) mTimer.getTotalTime());
-                mIndexQuestion++;
-                mAnswerButton.setBackground(getResources().getDrawable(R.drawable.true_shape));
+                onTrueAnswerClick();
             } else {
-                mAnswerButton.setBackground(getResources().getDrawable(R.drawable.false_shape));
-                mTimer.addTime(-3000);
-                ((Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE)).vibrate(250);
+                onFalseAnswerClick();
             }
             //mQuestionTextView.setText(mQuestion.getQuestionText() + " = " + mQuestion.getTrueAnswer().toString());
             if(mMistakesValue>mMaxMistakesValue){
@@ -215,6 +222,22 @@ public class DuringGameFragment extends Fragment {
                     updateUI();
                 }
             });
+        }
+
+        private void onFalseAnswerClick() {
+            mAnswerButton.setBackground(getResources().getDrawable(R.drawable.false_shape));
+            mTimer.addTime(-3000);
+            mMistakesValue++;
+            mSessionInfo.increaseFalseAnswers();
+            ((Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE)).vibrate(250);
+        }
+
+        private void onTrueAnswerClick() {
+            mTimer.addTime(3000);
+            mProgressBar.setMax((int) mTimer.getTotalTime());
+            mIndexQuestion++;
+            mSessionInfo.increaseTrueAnswers();
+            mAnswerButton.setBackground(getResources().getDrawable(R.drawable.true_shape));
         }
     }
 
