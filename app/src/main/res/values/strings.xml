@@ -9,7 +9,12 @@
     <string name="repeat">Repeat</string>
 
     <string name="round_format_list">round:\n%1$d/%2$d</string>
-    <string name="round_format_single">round:\n%1$d</string>
+    <string name="round_format_single">score:\n%1$d</string>
     <string name="mistake_format">mistake:\n%1$d/%2$d</string>
     <string name="time_format">Time:\n%1$d.%2$d</string>
+    <string name="player_name_hint">Add your name for save</string>
+    <string name="player_name">Player name</string>
+    <string name="score">Score</string>
+    <string name="no_results">No results</string>
+    <string name="game_over">Game Over</string>
 </resources>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:id="@+id/result_save_layout"
+    android:layout_height="wrap_content"
+    android:layout_margin="16dp"
+    android:layout_gravity="center">
+
+    <EditText
+        android:id="@+id/player_name_edit_text"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:hint="@string/player_name_hint"/>
+    <ImageButton
+        android:id="@+id/save_button"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:src="@drawable/ic_action_save"/>
+
+</LinearLayout>

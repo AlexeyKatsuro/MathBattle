@@ -25,48 +25,32 @@ public class MenuFragment extends Fragment {
 
     private RecyclerView mRecyclerView;
     private MenuRowAdapter mAdapter;
-    private List<MenuRow> mMenuRowList;
+    private List<MenuRow> mMenuRowList = new ArrayList<>();
+    private int mMenu_list_item_id;
 
-    public static MenuFragment newInstance() {
+    public static MenuFragment newInstance(List<MenuRow> menuRowList,int menu_list_item) {
 
         Bundle args = new Bundle();
         MenuFragment fragment = new MenuFragment();
+        fragment.setMenuRowList(menuRowList);
+        fragment.setMenuListItem(menu_list_item);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    public void setMenuRowList(List<MenuRow> menuRowList) {
+        mMenuRowList = menuRowList;
+    }
+
+    public void setMenuListItem(int meni_list_item){
+        mMenu_list_item_id = meni_list_item;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mMenuRowList = new ArrayList<>();
-        MenuRow playMenuRow = new MenuRow(getString(R.string.play), R.drawable.ic_action_play);
-        playMenuRow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getActivity(),GameActivity.class);
-                startActivity(intent);
-            }
-        });
-        MenuRow settingsMenuRow = new MenuRow(getString(R.string.settings), R.drawable.ic_action_settings);
-        settingsMenuRow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(getActivity(),R.string.settings,Toast.LENGTH_SHORT).show();
-            }
-        });
-        MenuRow exitMenuRow = new MenuRow(getString(R.string.exit), R.drawable.ic_action_exit);
-        exitMenuRow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getActivity().finishAffinity();
-            }
-        });
-
-        mMenuRowList.add(playMenuRow);
-        //mMenuRowList.add(settingsMenuRow);
-        mMenuRowList.add(exitMenuRow);
-
-        mAdapter = new MenuRowAdapter(getActivity(),R.layout.menu_list_item,mMenuRowList);
+        setRetainInstance(true);
+        mAdapter = new MenuRowAdapter(getActivity(), mMenu_list_item_id,mMenuRowList);
     }
 
     @Nullable

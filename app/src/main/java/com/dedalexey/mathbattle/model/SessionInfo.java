@@ -80,12 +80,25 @@ public class SessionInfo {
         return "SessionInfo{" +
                 "mId=" + mId +
                 ", mPlayerName='" + mPlayerName + '\'' +
-                ", mTotalTime=" + mTotalTime +
                 ", mTrueAnswers=" + mTrueAnswers +
-                ", mDate=" + mDate +
                 ", mFalseAnswers=" + mFalseAnswers +
+                ", mTotalTime=" + mTotalTime +
+                ", mDate=" + mDate +
                 '}';
     }
 
+    @Override
+    public boolean equals(Object obj) {
 
+        if(obj instanceof SessionInfo){
+            SessionInfo sessionInfo = (SessionInfo) obj;
+            if(mId.toString().equals(sessionInfo.getId().toString())){
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return super.equals(obj);
+        }
+    }
 }

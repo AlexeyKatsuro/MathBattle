@@ -22,6 +22,7 @@ public class Statistics {
     private static Statistics sStatistics;
     private Context mContext;
     private SQLiteDatabase mDatabase;
+    public static final int mLimit = 10;
 
     public static Statistics get(Context context){
         if(sStatistics == null){
@@ -61,7 +62,13 @@ public class Statistics {
                 new String[]{uuidString});
     }
 
-    private SessionCursorWrapper queryCrimes (String whereClause, String[] whereArgs) {
+    public void deleteCrime(SessionInfo sessionInfo){
+        String uuidString = sessionInfo.getId().toString();
+        mDatabase.delete(SessionsTable.NAME,SessionsTable.Cols.UUID + " = ?", new String[]{uuidString});
+    }
+
+
+    private SessionCursorWrapper queryCrimes (String whereClause, String[] whereArgs,int limit) {
         Cursor cursor = mDatabase.query(
                 SessionsTable.NAME,
                 null,
@@ -69,7 +76,8 @@ public class Statistics {
                 whereArgs,
                 null,
                 null,
-                null
+                SessionsTable.Cols.TRUE_ANSWERS + " DESC, " + SessionsTable.Cols.DATE + " DESC",
+                String.valueOf(limit)
         );
         return new SessionCursorWrapper(cursor);
     }
@@ -77,7 +85,7 @@ public class Statistics {
     public List<SessionInfo> getSessionInfoList(){
         List<SessionInfo> sessionInfoList = new ArrayList<>();
 
-        SessionCursorWrapper cursor = queryCrimes(null,null);
+        SessionCursorWrapper cursor = queryCrimes(null,null,mLimit);
 
         try {
             cursor.moveToFirst();
@@ -90,6 +98,23 @@ public class Statistics {
         }
 
         return sessionInfoList;
+    }
+
+    public boolean verifyForAdd(SessionInfo sessionInfo){
+        List<SessionInfo> sessionInfoList = getSessionInfoList();
+        if(sessionInfoList.size()>0) {
+
+            for (int i = 0; i < mLimit && i < sessionInfoList.size(); i++) {
+                int score = sessionInfo.getTrueAnswers();
+                int scoreItemList = sessionInfoList.get(i).getTrueAnswers();
+                if (score >= scoreItemList) {
+                    return true;
+                }
+            }
+            return false;
+        } else {
+            return true;
+        }
     }
 
 }

@@ -11,6 +11,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 
 import com.dedalexey.mathbattle.R;
+import com.dedalexey.mathbattle.model.SessionInfo;
 
 /**
  * Created by Alexey on 24.01.2018.
@@ -31,10 +32,9 @@ public class BeforeGameFragment extends Fragment {
     public static BeforeGameFragment newInstance() {
 
         Bundle args = new Bundle();
-
         BeforeGameFragment fragment = new BeforeGameFragment();
-
         fragment.setArguments(args);
+
         return fragment;
     }
 
