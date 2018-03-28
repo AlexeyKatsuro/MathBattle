@@ -1,30 +1,20 @@
 package com.dedalexey.mathbattle.Fragments;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.widget.CardView;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
-import com.dedalexey.mathbattle.Activities.GameActivity;
-import com.dedalexey.mathbattle.Activities.MenuActivity;
-import com.dedalexey.mathbattle.MenuRowAdapter;
 import com.dedalexey.mathbattle.R;
 import com.dedalexey.mathbattle.model.MenuRow;
 import com.dedalexey.mathbattle.model.SessionInfo;
@@ -34,16 +24,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class AfterGameFragment extends Fragment {
+public class AfterGameFragment extends GameFragment {
 
     public static final String TAG = AfterGameFragment.class.getSimpleName();
 
     private EditText mPlayerEditText;
     private ImageButton mSaveButton;
-    private CardView mSaveLayout;
+    private View mSaveLayout;
     private List<MenuRow> mMenuRowList = new ArrayList<>();
     private CallBacks mCallBacks;
-    private SessionInfo mSessionInfo;
     private MenuFragment mMenuFragment;
     private StatisticsFragment mStatisticFragment;
 
@@ -55,26 +44,17 @@ public class AfterGameFragment extends Fragment {
 
     public static AfterGameFragment newInstance(SessionInfo sessionInfo) {
 
-        Bundle args = new Bundle();
         AfterGameFragment fragment = new AfterGameFragment();
         fragment.setSessionInfo(sessionInfo);
-        Log.d(TAG,"In new Instance: "+sessionInfo.toString());
-        fragment.setArguments(args);
         return fragment;
     }
 
-    public void setSessionInfo(SessionInfo sessionInfo) {
-        mSessionInfo = sessionInfo;
-    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRetainInstance(true);
         initCallBacksListener();
         mMenuRowList = getMenuRowList();
-        Log.d(TAG,"On Create: "+mSessionInfo.toString());
-
     }
 
     @Nullable
@@ -84,13 +64,13 @@ public class AfterGameFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_after_game, container, false);
         mPlayerEditText = view.findViewById(R.id.player_name_edit_text);
         mSaveButton = view.findViewById(R.id.save_button);
-        mSaveLayout = view.findViewById(R.id.result_save_card_view);
+        mSaveLayout = view.findViewById(R.id.result_save_view);
 
         mSaveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String playerName = mPlayerEditText.getText().toString();
-                if(playerName!=null) {
+                if(playerName.length()>0) {
                     mSessionInfo.setPlayerName(playerName);
                 }
                 Log.d(TAG,"Before Save: "+mSessionInfo.toString());
@@ -106,6 +86,7 @@ public class AfterGameFragment extends Fragment {
         FragmentManager fm = getChildFragmentManager();
 
         mMenuFragment = (MenuFragment) fm.findFragmentById(R.id.menu_container);
+
         mStatisticFragment = (StatisticsFragment) fm.findFragmentById(R.id.statistic_container);
         if(mMenuFragment ==null) {
             mMenuFragment = MenuFragment.newInstance(mMenuRowList,R.layout.layout_row_image_text);
@@ -123,9 +104,13 @@ public class AfterGameFragment extends Fragment {
                     .commit();
         }
 
-        if(!Statistics.get(getActivity()).verifyForAdd(mSessionInfo)){
+        if(!Statistics.get(getActivity()).verifyForAdd(mSessionInfo)
+                || Statistics.get(getActivity()).find(mSessionInfo)){
             mSaveLayout.setVisibility(View.GONE);
+            //mStatisticFragment.scrollToPositionOf(mSessionInfo);
+
         }
+
 
 
         return view;

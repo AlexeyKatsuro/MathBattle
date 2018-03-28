@@ -31,7 +31,7 @@ import java.util.List;
  * Created by Alexey on 20.01.2018.
  */
 
-public class DuringGameFragment extends Fragment {
+public class DuringGameFragment extends GameFragment {
 
     private static final String TAG = DuringGameFragment.class.getSimpleName();
     private static final String SESSION_INFO = "session_info";
@@ -50,10 +50,10 @@ public class DuringGameFragment extends Fragment {
     private AnswerAdapter mAdapter;
     private CallBacks mCallBacks;
 
-    private SessionInfo mSessionInfo;
     private MyCountDownTimer mTimer;
     private long mInitialTime = 15000;
     private Question mQuestion;
+    private boolean isFinished;
 
     public interface CallBacks {
         void onEndGame();
@@ -61,18 +61,19 @@ public class DuringGameFragment extends Fragment {
 
     public static DuringGameFragment newInstance(SessionInfo sessionInfo) {
 
-        Bundle args = new Bundle();
         DuringGameFragment fragment = new DuringGameFragment();
         fragment.setSessionInfo(sessionInfo);
-        fragment.setArguments(args);
+
         return fragment;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRetainInstance(true);
+
         mProvider = new MathQuestionProvider();
+
+        mQuestion = mProvider.provideQuestionNumber(mIndexQuestion);
 
         initCallBacksListener();
         mTimer = new MyCountDownTimer(mInitialTime,50);
@@ -81,6 +82,7 @@ public class DuringGameFragment extends Fragment {
             public void onTick(long millisUntilFinished) {
                 if(isAdded()) {
                     mTimeTextView.setText(getString(R.string.time_format, millisUntilFinished / 1000, millisUntilFinished % 1000 / 10));
+                    mProgressBar.setMax((int) mTimer.getTotalTime());
                     mProgressBar.setProgress((int) (mTimer.getTotalTime() - millisUntilFinished));
                 }
             }
@@ -88,49 +90,18 @@ public class DuringGameFragment extends Fragment {
         mTimer.setOnFinishListener(new MyCountDownTimer.onFinishListener() {
             @Override
             public void onFinish() {
+                Log.d(TAG, "Time Out");
                 onFinishGame();
             }
         });
     }
 
-    private void setSessionInfo(SessionInfo sessionInfo) {
-        mSessionInfo = sessionInfo;
-    }
-
-    public void onFinishGame() {
-        mTimer.cancel();
-        mSessionInfo.setTotalTime(mTimer.getTotalTime());
-        Log.d(TAG,"Finish: "+mSessionInfo.toString());
-        mAnswersRecyclerView.setVisibility(View.INVISIBLE);
-        mProgressBar.setVisibility(View.INVISIBLE);
-        mTimeTextView.setVisibility(View.INVISIBLE);
-        mQuestionTextView.setText(R.string.game_over);
-
-
-        Handler handler = new Handler();
-        vibrate(1000);
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mCallBacks.onEndGame();
-            }
-        },2000);
-
-    }
-
-    private void initCallBacksListener() {
-        Fragment fragment = getParentFragment();
-        if ( fragment instanceof CallBacks) {
-            mCallBacks = (CallBacks) fragment;
-        } else {
-            Log.i(TAG,"fragment NOT instanceof CallBacks");
-        }
-    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragmant_during_game,container,false);
+
 
         mProgressBar = view.findViewById(R.id.progressBar);
         mQuestionTextView = view.findViewById(R.id.question_text_view);
@@ -138,19 +109,22 @@ public class DuringGameFragment extends Fragment {
         mMistakesTextView = view.findViewById(R.id.mistakes_text_view);
         mAnswersRecyclerView = view.findViewById(R.id.answers_recycler_view);
         mTimeTextView = view.findViewById(R.id.time_text_view);
-        mAnswersRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-
         mProgressBar.setMax((int) mInitialTime);
+
+        if(mAdapter!=null) {
+            mAnswersRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+            mAnswersRecyclerView.setAdapter(mAdapter);
+        }
 
 
         updateUI();
-        mTimer.start();
         return view;
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        Log.d(TAG,"ON PAUSE");
         if(mTimer!=null){
             mTimer.cancel();
         }
@@ -159,21 +133,23 @@ public class DuringGameFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
+        Log.d(TAG,"ON STOP");
         
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        Log.d(TAG,"ON RESUME");
         if(mTimer!=null){
-            mTimer.resume();
+           mTimer.resume();
         }
     }
 
     @Override
     public void onDestroy() {
-
         super.onDestroy();
+        Log.d(TAG,"ON DESTROY");
         if(mTimer!=null){
             mTimer.cancel();
         }
@@ -181,11 +157,12 @@ public class DuringGameFragment extends Fragment {
         mTimer = null;
 
     }
+
     private void updateUI() {
 
 
         if(isAdded()) {
-            mQuestion = mProvider.provideQuestionNumber(mIndexQuestion);
+
 
             mQuestionTextView.setText(mQuestion.getQuestionText() + " = ?");
             mMistakesTextView.setText(getString(R.string.mistake_format, mMistakesValue, mMaxMistakesValue));
@@ -198,14 +175,59 @@ public class DuringGameFragment extends Fragment {
 
             if (mAdapter == null) {
                 mAdapter = new AnswerAdapter(mQuestion.getAnswerList());
+                mAnswersRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
                 mAnswersRecyclerView.setAdapter(mAdapter);
 
             } else {
                 mAdapter.setAnswerList(mQuestion.getAnswerList());
                 mAdapter.notifyDataSetChanged();
             }
+
+            if(isFinished){
+                finishUI();
+            }
         }
 
+    }
+
+    public synchronized void onFinishGame() {
+        Log.d(TAG, "onFinishGame");
+
+        if(isFinished){
+            return;
+        }
+        Log.d(TAG,"Finish: "+mSessionInfo.toString());
+        isFinished= true;
+        mTimer.cancel();
+        mTimer.setFinished(true);
+        finishUI();
+
+        Handler handler = new Handler();
+        vibrate(1000);
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mCallBacks.onEndGame();
+            }
+        },5000);
+
+    }
+
+    private void finishUI() {
+        mSessionInfo.setTotalTime(mTimer.getTotalTime());
+        mAnswersRecyclerView.setVisibility(View.INVISIBLE);
+        mProgressBar.setVisibility(View.INVISIBLE);
+        mTimeTextView.setVisibility(View.INVISIBLE);
+        mQuestionTextView.setText(R.string.game_over);
+    }
+
+    private void initCallBacksListener() {
+        Fragment fragment = getParentFragment();
+        if ( fragment instanceof CallBacks) {
+            mCallBacks = (CallBacks) fragment;
+        } else {
+            Log.i(TAG,"fragment NOT instanceof CallBacks");
+        }
     }
 
     private class AnswerHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
@@ -236,10 +258,12 @@ public class DuringGameFragment extends Fragment {
             }
             //mQuestionTextView.setText(mQuestion.getQuestionText() + " = " + mQuestion.getTrueAnswer().toString());
             if(mMistakesValue>mMaxMistakesValue){
+                Log.d(TAG, "Many mistakes");
                 onFinishGame();
                 return;
             }
-            Log.d(TAG,"After Click on answer: " + mSessionInfo.toString());
+
+            mQuestion = mProvider.provideQuestionNumber(mIndexQuestion);
             Handler handler = new Handler();
             handler.post(new Runnable() {
                 @Override

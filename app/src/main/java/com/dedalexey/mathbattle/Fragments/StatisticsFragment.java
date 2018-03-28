@@ -18,10 +18,6 @@ import com.dedalexey.mathbattle.model.Statistics;
 import java.util.List;
 
 
-/**
- * Created by alexey on 3/18/18.
- */
-
 public class StatisticsFragment extends Fragment {
 
     private static final String TAG = StatisticsFragment.class.getSimpleName() ;
@@ -58,12 +54,6 @@ public class StatisticsFragment extends Fragment {
 
     public void updateUI() {
         mSessionInfoList = Statistics.get(getActivity()).getSessionInfoList();
-       // Log.d(TAG, String.valueOf(mSessionInfoList.size()));
-        for(SessionInfo sessionInfo : mSessionInfoList){
-            Log.d(TAG,sessionInfo.toString());
-        }
-
-
 
         if (mAdapter == null) {
             mAdapter = new SessionInfoAdapter(mSessionInfoList);
@@ -80,9 +70,6 @@ public class StatisticsFragment extends Fragment {
     }
     public void scrollToPositionOf(SessionInfo sessionInfo){
         int position = 0;
-        for(SessionInfo sesInf: mSessionInfoList){
-            Log.d(TAG,sesInf.toString());
-        }
         for(SessionInfo sesInf: mSessionInfoList){
             if(sessionInfo.equals(sesInf)){
                 position = mSessionInfoList.indexOf(sesInf);

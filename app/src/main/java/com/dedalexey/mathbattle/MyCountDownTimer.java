@@ -2,11 +2,14 @@ package com.dedalexey.mathbattle;
 
 
 import android.os.CountDownTimer;
+import android.util.Log;
 
 public class MyCountDownTimer {
 
-    private boolean mIsWasStoped;
-    private boolean mIsRunning;
+    private static final String TAG = MyCountDownTimer.class.getSimpleName();
+    private boolean isWasStopped;
+    private boolean isRunning;
+    private boolean isFinished;
 
     private CountDownTimer mTimer;
     private onTickListener mOnTickListener;
@@ -29,25 +32,43 @@ public class MyCountDownTimer {
         mTimer = newCountDownTimer(mTotalTime,mDownInterval);
     }
     public void cancel(){
-        mTimer.cancel();
-        mIsRunning=false;
-        mIsWasStoped=true;
+        if(isRunning) {
+            mTimer.cancel();
+            isRunning = false;
+            isWasStopped = true;
+        }
     }
+
+    public void setFinished(boolean finished) {
+        isFinished = finished;
+    }
+
     public void resume(){
-        if(mIsWasStoped) {
+        if(!isFinished) {
+            Log.d(TAG,"Resume");
             mTimer = newCountDownTimer(mUntilFinishedTime, mDownInterval);
            start();
         }
     }
     public void start(){
+        mTimer.cancel();
         mTimer.start();
-        mIsRunning = true;
+        isRunning = true;
+        isFinished=false;
 
     }
 
 
     public boolean isRunning() {
-        return mIsRunning;
+        return isRunning;
+    }
+
+    public boolean isFinished() {
+        return isFinished;
+    }
+
+    public boolean isWasStopped() {
+        return isWasStopped;
     }
 
     private CountDownTimer newCountDownTimer(final long totalTime, final long downInterval) {
@@ -62,6 +83,8 @@ public class MyCountDownTimer {
 
             @Override
             public void onFinish() {
+                isRunning=false;
+                isFinished=true;
                 if(mOnFinishListener!=null) {
                     mOnFinishListener.onFinish();
                 }
@@ -74,8 +97,7 @@ public class MyCountDownTimer {
         if(millis>=0)
         mTotalTime+=millis;
         mUntilFinishedTime+=millis;
-        mTimer = newCountDownTimer(mUntilFinishedTime,mDownInterval);
-        mTimer.start();
+        resume();
     }
 
     public long getMillisUntilFinishedTime() {

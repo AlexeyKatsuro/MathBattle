@@ -62,13 +62,31 @@ public class Statistics {
                 new String[]{uuidString});
     }
 
-    public void deleteCrime(SessionInfo sessionInfo){
+    public void deleteSessionInfo(SessionInfo sessionInfo){
         String uuidString = sessionInfo.getId().toString();
         mDatabase.delete(SessionsTable.NAME,SessionsTable.Cols.UUID + " = ?", new String[]{uuidString});
     }
 
+    public boolean find(SessionInfo sessionInfo){
+        SessionCursorWrapper cursor = queryCrimes(SessionsTable.Cols.UUID + " = ?",
+                new String[]{sessionInfo.getId().toString()},null);
+        try {
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()){
+                SessionInfo cursorInf =cursor.getSessionInfo();
+                if(sessionInfo.equals(cursorInf)){
+                    return true;
+                }
+                cursor.moveToNext();
+            }
+            return false;
+        } finally {
+            cursor.close();
 
-    private SessionCursorWrapper queryCrimes (String whereClause, String[] whereArgs,int limit) {
+        }
+    }
+
+    private SessionCursorWrapper queryCrimes (String whereClause, String[] whereArgs,String limit) {
         Cursor cursor = mDatabase.query(
                 SessionsTable.NAME,
                 null,
@@ -77,7 +95,7 @@ public class Statistics {
                 null,
                 null,
                 SessionsTable.Cols.TRUE_ANSWERS + " DESC, " + SessionsTable.Cols.DATE + " DESC",
-                String.valueOf(limit)
+               limit
         );
         return new SessionCursorWrapper(cursor);
     }
@@ -85,7 +103,7 @@ public class Statistics {
     public List<SessionInfo> getSessionInfoList(){
         List<SessionInfo> sessionInfoList = new ArrayList<>();
 
-        SessionCursorWrapper cursor = queryCrimes(null,null,mLimit);
+        SessionCursorWrapper cursor = queryCrimes(null,null,String.valueOf(mLimit));
 
         try {
             cursor.moveToFirst();
@@ -102,9 +120,9 @@ public class Statistics {
 
     public boolean verifyForAdd(SessionInfo sessionInfo){
         List<SessionInfo> sessionInfoList = getSessionInfoList();
-        if(sessionInfoList.size()>0) {
+        if(sessionInfoList.size()>=mLimit) {
 
-            for (int i = 0; i < mLimit && i < sessionInfoList.size(); i++) {
+            for (int i = 0; i < mLimit; i++) {
                 int score = sessionInfo.getTrueAnswers();
                 int scoreItemList = sessionInfoList.get(i).getTrueAnswers();
                 if (score >= scoreItemList) {
