@@ -289,9 +289,9 @@ public class DuringGameFragment extends GameFragment {
             mAnswerButton.setBackground(getResources().getDrawable(R.drawable.true_shape));
         }
     }
-
+//vibrarion
     private void vibrate(long mill) {
-       // ((Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE)).vibrate(mill);
+       ((Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE)).vibrate(mill);
     }
 
     private class AnswerAdapter extends RecyclerView.Adapter<AnswerHolder>{
