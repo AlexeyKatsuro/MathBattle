@@ -20,9 +20,10 @@ public class GameManagerFragment extends Fragment
     private static final String TAG = GameManagerFragment.class.getSimpleName();
 
     private boolean isReady;
-    private BeforeGameFragment mBeforeGameFragment;
-    private DuringGameFragment mDuringGameFragment;
-    private AfterGameFragment mAfterGameFragment;
+//    private BeforeGameFragment mBeforeGameFragment;
+//    private DuringGameFragment mDuringGameFragment;
+//    private AfterGameFragment mAfterGameFragment;
+    private GameFragment mCurrentGameFragment;
     private SessionInfo mSessionInfo;
 
     public static GameManagerFragment newInstance() {
@@ -36,18 +37,23 @@ public class GameManagerFragment extends Fragment
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG,"onCreate");
+        setRetainInstance(true);
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.d(TAG,"onCreateView");
         View view = inflater.inflate(R.layout.fragment_game,container,false);
-        mSessionInfo = new SessionInfo();
-        mBeforeGameFragment = BeforeGameFragment.newInstance();
-        if(mSessionInfo==null){
-            Log.d(TAG,"NULL");
+
+        if(mCurrentGameFragment==null) {
+            Log.d(TAG,"onCreateView/ Create new Current Game Fragment");
+            mSessionInfo = new SessionInfo();
+            mCurrentGameFragment = BeforeGameFragment.newInstance(mSessionInfo);
         }
-        replaceFragment(mBeforeGameFragment);
+
+        replaceFragment(mCurrentGameFragment);
 
         return view;
     }
@@ -64,8 +70,8 @@ public class GameManagerFragment extends Fragment
     public void onReadyClick(boolean isReady) {
        this.isReady = isReady;
         if(this.isReady){
-            mDuringGameFragment = DuringGameFragment.newInstance(mSessionInfo);
-            replaceFragment(mDuringGameFragment);
+            mCurrentGameFragment = DuringGameFragment.newInstance(mSessionInfo);
+            replaceFragment(mCurrentGameFragment);
         }
 //        Log.d(TAG,"Send to DuringGF: "+mSessionInfo!=null ? mSessionInfo.toString(): "null");
     }
@@ -73,17 +79,16 @@ public class GameManagerFragment extends Fragment
     @Override
     public void onEndGame() {
         isReady= false;
-        mAfterGameFragment = AfterGameFragment.newInstance(mSessionInfo);
+        mCurrentGameFragment = AfterGameFragment.newInstance(mSessionInfo);
 
-        replaceFragment(mAfterGameFragment);
-        Log.d(TAG,"Send to AfterGF: "+ mSessionInfo.toString());
+        replaceFragment(mCurrentGameFragment);
     }
 
     @Override
     public void onRepeatClick() {
         mSessionInfo = new SessionInfo();
-        mBeforeGameFragment = BeforeGameFragment.newInstance();
-        replaceFragment(mBeforeGameFragment);
+        mCurrentGameFragment = BeforeGameFragment.newInstance(mSessionInfo);
+        replaceFragment(mCurrentGameFragment);
     }
 
 }
