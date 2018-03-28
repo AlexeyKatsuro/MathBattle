@@ -291,7 +291,7 @@ public class DuringGameFragment extends GameFragment {
     }
 
     private void vibrate(long mill) {
-       // ((Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE)).vibrate(mill);
+       ((Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE)).vibrate(mill);
     }
 
     private class AnswerAdapter extends RecyclerView.Adapter<AnswerHolder>{
