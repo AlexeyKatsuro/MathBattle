@@ -157,7 +157,6 @@ public class DuringGameFragment extends GameFragment {
         mTimer = null;
 
     }
-
     private void updateUI() {
 
 
@@ -207,10 +206,11 @@ public class DuringGameFragment extends GameFragment {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                mCallBacks.onEndGame();
+                if(mCallBacks !=null && isAdded()) {
+                    mCallBacks.onEndGame();
+                }
             }
         },5000);
-
     }
 
     private void finishUI() {

@@ -1,5 +1,6 @@
 package com.dedalexey.mathbattle.Fragments;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -10,12 +11,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.dedalexey.mathbattle.Activities.GameActivity;
 import com.dedalexey.mathbattle.R;
 import com.dedalexey.mathbattle.model.SessionInfo;
 
 
 public class GameManagerFragment extends Fragment
-        implements BeforeGameFragment.CallBacks, DuringGameFragment.CallBacks,  AfterGameFragment.CallBacks{
+        implements
+        BeforeGameFragment.CallBacks,
+        DuringGameFragment.CallBacks,
+        AfterGameFragment.CallBacks{
 
     private static final String TAG = GameManagerFragment.class.getSimpleName();
 
@@ -23,6 +28,7 @@ public class GameManagerFragment extends Fragment
 //    private BeforeGameFragment mBeforeGameFragment;
 //    private DuringGameFragment mDuringGameFragment;
 //    private AfterGameFragment mAfterGameFragment;
+    private GameActivity mActivity;
     private GameFragment mCurrentGameFragment;
     private SessionInfo mSessionInfo;
 
@@ -58,7 +64,8 @@ public class GameManagerFragment extends Fragment
         return view;
     }
 
-    private void replaceFragment(Fragment fragment) {
+    private void replaceFragment(GameFragment fragment) {
+        mActivity.setOnBackPressedListener(fragment);
         FragmentManager fm = getChildFragmentManager();
         fm.beginTransaction()
                 .replace(R.id.fragment_play_container,fragment)
@@ -91,4 +98,11 @@ public class GameManagerFragment extends Fragment
         replaceFragment(mCurrentGameFragment);
     }
 
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if(activity instanceof GameActivity){
+            mActivity = (GameActivity) activity;
+        }
+    }
 }
